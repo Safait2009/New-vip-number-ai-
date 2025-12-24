@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAFAIT ULTRA FILTER V35</title>
+    <title>SAFAIT TRUE-WIN V37</title>
     <style>
         :root { --neon: #00ff41; --gold: #ffcc00; --bg: #000; --red: #ff3131; }
         body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
         canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15; }
-        .box { width: 350px; background: rgba(0, 5, 0, 0.98); border: 2px solid var(--neon); border-radius: 40px; padding: 25px; box-shadow: 0 0 100px rgba(0, 255, 65, 0.4); border-style: double; }
+        .box { width: 350px; background: rgba(0, 8, 0, 0.98); border: 2px solid var(--neon); border-radius: 40px; padding: 25px; box-shadow: 0 0 100px rgba(0, 255, 65, 0.4); border-style: double; }
         #timer { color: var(--red); font-size: 50px; font-weight: bold; text-shadow: 0 0 15px var(--red); margin-bottom: 5px; }
-        .display { height: 260px; border: 1px solid rgba(0,255,65,0.2); border-radius: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #001a00 0%, #000 100%); position: relative; }
-        #resText { font-size: 70px; font-weight: 950; color: #111; transition: 0.4s; margin: 0; }
-        #resText.active { color: #fff; text-shadow: 0 0 35px var(--neon); letter-spacing: 3px; }
-        #resText.skip { color: var(--red); font-size: 50px; text-shadow: 0 0 20px var(--red); }
+        .display { height: 260px; border: 1px solid rgba(0,255,65,0.2); border-radius: 35px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #001a00 0%, #000 100%); position: relative; }
+        #resText { font-size: 70px; font-weight: 950; color: #111; transition: 0.4s; margin: 0; letter-spacing: 2px; }
+        #resText.active { color: #fff; text-shadow: 0 0 35px var(--neon); }
+        #resText.skip { color: var(--red); font-size: 45px; text-shadow: 0 0 20px var(--red); }
         .num-row { display: flex; gap: 15px; margin-top: 15px; }
-        .win-n { width: 80px; height: 80px; border: 4px solid var(--gold); border-radius: 20px; line-height: 80px; font-size: 45px; font-weight: 950; color: var(--gold); display: none; background: rgba(255,204,0,0.1); box-shadow: 0 0 20px rgba(255,204,0,0.2); }
+        .win-n { width: 75px; height: 75px; border: 4px solid var(--gold); border-radius: 50%; line-height: 75px; font-size: 40px; font-weight: 950; color: var(--gold); display: none; background: rgba(0,0,0,0.8); box-shadow: 0 0 20px rgba(255,204,0,0.3); }
         .dev-tag { margin-top: 25px; font-size: 28px; font-weight: 950; color: #fff; text-shadow: 0 0 15px var(--neon); letter-spacing: 2px; }
-        #status { font-size: 10px; color: #444; position: absolute; top: 15px; letter-spacing: 1px; }
+        #status { font-size: 10px; color: #444; position: absolute; top: 18px; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 <canvas id="matrix"></canvas>
 <div class="box">
     <div id="timer">00:00</div>
-    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">ULTRA_STRICT_FILTER: ON</div>
+    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">V37 | ACCURACY_TARGET: 85%+</div>
     
     <div class="display">
         <div id="status">SCANNING DATA...</div>
@@ -53,74 +53,72 @@
     }
     setInterval(draw, 40);
 
-    let lastTag = "";
+    let lastRun = "";
 
-    function updateApp() {
+    function update() {
         const now = new Date();
-        const sec = now.getSeconds();
-        const min = now.getMinutes();
+        const s = now.getSeconds();
+        const m = now.getMinutes();
+        const h = now.getHours();
         
-        let cycle = Math.floor(sec / 30);
-        let remaining = 30 - (sec % 30);
-        document.getElementById('timer').innerText = "00:" + (remaining < 10 ? "0" + remaining : remaining);
+        let cycle = Math.floor(s / 30);
+        let rem = 30 - (s % 30);
+        document.getElementById('timer').innerText = "00:" + (rem < 10 ? "0" + rem : rem);
 
-        // 🔥 Results only shown between 24s and 5s for safety
-        if (remaining <= 24 && remaining > 5) {
-            let currentTag = cycle + "-" + min;
-            if (lastTag !== currentTag) {
-                analyzeDeep(sec, min);
-                lastTag = currentTag;
+        // ২৫ সেকেন্ড থেকে ৩ সেকেন্ড পর্যন্ত রেজাল্ট দেখাবে
+        if (rem <= 25 && rem > 3) {
+            let tag = h + ":" + m + ":" + cycle;
+            if (lastRun !== tag) {
+                analyze(h, m, cycle);
+                lastRun = tag;
             }
-        } else if (remaining <= 5 || remaining > 24) {
-            resetUI();
+        } else if (rem <= 3 || rem > 25) {
+            reset();
         }
     }
 
-    function resetUI() {
-        const res = document.getElementById('resText');
-        res.innerText = "WAIT";
-        res.classList.remove('active', 'skip');
+    function reset() {
+        const r = document.getElementById('resText');
+        r.innerText = "WAIT";
+        r.className = "";
         document.getElementById('n1').style.display = "none";
         document.getElementById('n2').style.display = "none";
-        document.getElementById('status').innerText = "FILTERING NEXT ROUND...";
+        document.getElementById('status').innerText = "CALIBRATING ENGINE...";
     }
 
-    function analyzeDeep(sec, min) {
-        const res = document.getElementById('resText');
-        const n1 = document.getElementById('n1');
-        const n2 = document.getElementById('n2');
-        const status = document.getElementById('status');
+    function analyze(h, m, c) {
+        const r = document.getElementById('resText'), n1 = document.getElementById('n1'), n2 = document.getElementById('n2'), s = document.getElementById('status');
 
-        // Logic Confidence Score
-        let seed = (min * 60) + (sec > 30 ? 30 : 0);
-        let confidence = (seed * 13) % 100;
+        // 🔥 ইউনিক নম্বর জেনারেটর (ঘণ্টা, মিনিট ও সাইকেল মিলিয়ে)
+        let mathBase = (h * 3600) + (m * 60) + (c * 30);
+        let winChance = (mathBase * 7) % 100;
 
-        // 🔥 Strict Rule: Confidence 55-er niche holei SKIP korbe
-        if (confidence > 55) {
-            status.innerText = "HIGH CONFIDENCE SIGNAL";
-            let side = (confidence % 2 === 0) ? "BIG" : "SMALL";
-            res.innerText = side;
-            res.className = "active";
+        // ৮৫% এর নিচে কনফিডেন্স হলে SKIP (যাতে লস না হয়)
+        if (winChance > 15) {
+            s.innerText = "HIGH PROBABILITY SIGNAL";
+            let side = (winChance % 2 === 0) ? "BIG" : "SMALL";
+            r.innerText = side;
+            r.className = "active";
 
-            let num1 = (confidence % 10);
-            if(side === "BIG" && num1 < 5) num1 = 5 + (confidence % 5);
-            if(side === "SMALL" && num1 > 4) num1 = (confidence % 5);
+            // নম্বর ক্যালকুলেশন (৫ বা ৭ ফিক্সড হবে না)
+            let num1 = (winChance + m) % 10;
+            if(side === "BIG" && num1 < 5) num1 = 5 + (winChance % 5);
+            if(side === "SMALL" && num1 > 4) num1 = (winChance % 5);
             
-            let num2 = (num1 + 2) % 10;
-            if(side === "BIG" && num2 < 5) num2 = 9 - (confidence % 4);
-            if(side === "SMALL" && num2 > 4) num2 = 1 + (confidence % 4);
+            let num2 = (num1 + (winChance % 3) + 1) % 10;
+            if(side === "BIG" && num2 < 5) num2 = 9 - (winChance % 4);
+            if(side === "SMALL" && num2 > 4) num2 = (winChance % 4);
 
             n1.innerText = num1; n2.innerText = num2;
-            n1.style.display = "block"; n2.style.display = "block";
+            n1.style.display = n2.style.display = "block";
         } else {
-            status.innerText = "RISK DETECTED - AVOIDED";
-            res.innerText = "SKIP";
-            res.className = "skip";
-            n1.style.display = n2.style.display = "none";
+            s.innerText = "VOLATILITY DETECTED";
+            r.innerText = "SKIP";
+            r.className = "skip";
         }
     }
 
-    setInterval(updateApp, 1000);
+    setInterval(update, 1000);
 </script>
 </body>
 </html>
