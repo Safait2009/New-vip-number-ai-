@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAFAIT AUTO-CLOCK 30S</title>
+    <title>SAFAIT ULTRA FILTER V35</title>
     <style>
         :root { --neon: #00ff41; --gold: #ffcc00; --bg: #000; --red: #ff3131; }
         body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
         canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15; }
-        .box { width: 350px; background: rgba(0, 8, 0, 0.98); border: 2px solid var(--neon); border-radius: 35px; padding: 25px; box-shadow: 0 0 80px rgba(0, 255, 65, 0.3); }
-        #timer { color: var(--red); font-size: 45px; font-weight: bold; text-shadow: 0 0 15px var(--red); margin-bottom: 5px; }
-        .period-box { font-size: 18px; color: var(--gold); margin-bottom: 15px; letter-spacing: 1px; }
-        .display { height: 240px; border: 1px solid rgba(0,255,65,0.2); border-radius: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #001a00 0%, #000 100%); position: relative; }
-        #resText { font-size: 75px; font-weight: 950; color: #111; transition: 0.3s; margin: 0; }
-        #resText.active { color: #fff; text-shadow: 0 0 30px var(--neon); }
-        .num-row { display: flex; gap: 15px; margin-top: 10px; }
-        .win-n { width: 70px; height: 70px; border: 3px solid var(--gold); border-radius: 50%; line-height: 70px; font-size: 40px; font-weight: 950; color: var(--gold); display: none; background: rgba(0,0,0,0.5); }
+        .box { width: 350px; background: rgba(0, 5, 0, 0.98); border: 2px solid var(--neon); border-radius: 40px; padding: 25px; box-shadow: 0 0 100px rgba(0, 255, 65, 0.4); border-style: double; }
+        #timer { color: var(--red); font-size: 50px; font-weight: bold; text-shadow: 0 0 15px var(--red); margin-bottom: 5px; }
+        .display { height: 260px; border: 1px solid rgba(0,255,65,0.2); border-radius: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #001a00 0%, #000 100%); position: relative; }
+        #resText { font-size: 70px; font-weight: 950; color: #111; transition: 0.4s; margin: 0; }
+        #resText.active { color: #fff; text-shadow: 0 0 35px var(--neon); letter-spacing: 3px; }
+        #resText.skip { color: var(--red); font-size: 50px; text-shadow: 0 0 20px var(--red); }
+        .num-row { display: flex; gap: 15px; margin-top: 15px; }
+        .win-n { width: 80px; height: 80px; border: 4px solid var(--gold); border-radius: 20px; line-height: 80px; font-size: 45px; font-weight: 950; color: var(--gold); display: none; background: rgba(255,204,0,0.1); box-shadow: 0 0 20px rgba(255,204,0,0.2); }
         .dev-tag { margin-top: 25px; font-size: 28px; font-weight: 950; color: #fff; text-shadow: 0 0 15px var(--neon); letter-spacing: 2px; }
-        #status { font-size: 11px; color: #444; position: absolute; top: 15px; }
+        #status { font-size: 10px; color: #444; position: absolute; top: 15px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 <canvas id="matrix"></canvas>
 <div class="box">
     <div id="timer">00:00</div>
-    <div class="period-box">SYSTEM AUTO-SYNC ACTIVE</div>
+    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">ULTRA_STRICT_FILTER: ON</div>
     
     <div class="display">
-        <div id="status">ANALYZING PHONE CLOCK...</div>
+        <div id="status">SCANNING DATA...</div>
         <div id="resText">WAIT</div>
         <div class="num-row">
             <div id="n1" class="win-n">?</div>
@@ -36,11 +36,9 @@
     </div>
 
     <div class="dev-tag">DEVELOPER SAFAIT</div>
-    <p style="font-size: 10px; color: #555; margin-top: 10px;">V33 | NO MANUAL SYNC NEEDED</p>
 </div>
 
 <script>
-    // Matrix Background
     const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     const drops = Array(Math.floor(canvas.width/20)).fill(1);
@@ -55,19 +53,25 @@
     }
     setInterval(draw, 40);
 
+    let lastTag = "";
+
     function updateApp() {
         const now = new Date();
-        const seconds = now.getSeconds();
+        const sec = now.getSeconds();
+        const min = now.getMinutes();
         
-        // ৩০ সেকেন্ডের সাইকেল হিসাব (০-২৯ এবং ৩০-৫৯)
-        let remaining = 30 - (seconds % 30);
+        let cycle = Math.floor(sec / 30);
+        let remaining = 30 - (sec % 30);
         document.getElementById('timer').innerText = "00:" + (remaining < 10 ? "0" + remaining : remaining);
 
-        // 🔥 ২৫ থেকে ২০ সেকেন্ডের মধ্যে রেজাল্ট চলে আসবে
-        // যাতে আপনি হাতে ২০ সেকেন্ড সময় পান বেট ধরার জন্য
-        if (remaining <= 25 && remaining > 0) {
-            showResult(seconds, now.getMinutes());
-        } else if (remaining > 25 || remaining === 0) {
+        // 🔥 Results only shown between 24s and 5s for safety
+        if (remaining <= 24 && remaining > 5) {
+            let currentTag = cycle + "-" + min;
+            if (lastTag !== currentTag) {
+                analyzeDeep(sec, min);
+                lastTag = currentTag;
+            }
+        } else if (remaining <= 5 || remaining > 24) {
             resetUI();
         }
     }
@@ -75,47 +79,47 @@
     function resetUI() {
         const res = document.getElementById('resText');
         res.innerText = "WAIT";
-        res.classList.remove('active');
+        res.classList.remove('active', 'skip');
         document.getElementById('n1').style.display = "none";
         document.getElementById('n2').style.display = "none";
-        document.getElementById('status').innerText = "WAITING FOR NEXT ROUND...";
+        document.getElementById('status').innerText = "FILTERING NEXT ROUND...";
     }
 
-    function showResult(sec, min) {
+    function analyzeDeep(sec, min) {
         const res = document.getElementById('resText');
         const n1 = document.getElementById('n1');
         const n2 = document.getElementById('n2');
         const status = document.getElementById('status');
 
-        if (res.innerText !== "WAIT") return; // এক রাউন্ডে একবারই হবে
-
-        status.innerText = "ALGORITHM SYNCED";
-        
-        // ঘড়ির মিনিট এবং সেকেন্ড ব্যবহার করে ইউনিক ম্যাথ
+        // Logic Confidence Score
         let seed = (min * 60) + (sec > 30 ? 30 : 0);
-        let factor = (seed * 19) % 100;
+        let confidence = (seed * 13) % 100;
 
-        if (factor > 20) {
-            let side = (factor % 2 === 0) ? "BIG" : "SMALL";
+        // 🔥 Strict Rule: Confidence 55-er niche holei SKIP korbe
+        if (confidence > 55) {
+            status.innerText = "HIGH CONFIDENCE SIGNAL";
+            let side = (confidence % 2 === 0) ? "BIG" : "SMALL";
             res.innerText = side;
-            res.classList.add('active');
+            res.className = "active";
 
-            let num1 = factor % 10;
-            if(side === "BIG" && num1 < 5) num1 += 2;
-            if(side === "SMALL" && num1 > 4) num1 -= 2;
+            let num1 = (confidence % 10);
+            if(side === "BIG" && num1 < 5) num1 = 5 + (confidence % 5);
+            if(side === "SMALL" && num1 > 4) num1 = (confidence % 5);
             
-            let num2 = (num1 + 3) % 10;
-            if(side === "BIG" && num2 < 5) num2 = 9 - (num1 % 3);
-            if(side === "SMALL" && num2 > 4) num2 = 1 + (num1 % 3);
+            let num2 = (num1 + 2) % 10;
+            if(side === "BIG" && num2 < 5) num2 = 9 - (confidence % 4);
+            if(side === "SMALL" && num2 > 4) num2 = 1 + (confidence % 4);
 
             n1.innerText = num1; n2.innerText = num2;
             n1.style.display = "block"; n2.style.display = "block";
         } else {
+            status.innerText = "RISK DETECTED - AVOIDED";
             res.innerText = "SKIP";
+            res.className = "skip";
+            n1.style.display = n2.style.display = "none";
         }
     }
 
-    // প্রতি সেকেন্ডে চেক করবে
     setInterval(updateApp, 1000);
 </script>
 </body>
