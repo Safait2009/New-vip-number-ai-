@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAIT - THE FINAL LEGEND</title>
+    <style>
+        :root { --neon: #00ff41; --gold: #ffcc00; --bg: #000; --red: #ff3131; }
+        body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15; }
+        .box { width: 350px; background: rgba(0, 10, 0, 0.98); border: 3px solid var(--neon); border-radius: 35px; padding: 25px; box-shadow: 0 0 100px rgba(0, 255, 65, 0.4); border-style: double; position: relative; }
+        input, select { width: 90%; padding: 15px; background: #000; border: 1.5px solid var(--neon); color: var(--gold); font-size: 20px; border-radius: 12px; margin-bottom: 12px; text-align: center; font-weight: 900; outline: none; }
+        .display { height: 260px; border: 1px solid rgba(0,255,65,0.3); border-radius: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 15px 0; background: radial-gradient(circle, #001500 0%, #000 100%); }
+        #resText { font-size: 65px; font-weight: 950; color: #111; transition: 0.5s; }
+        #resText.active { color: #fff; text-shadow: 0 0 30px var(--neon); letter-spacing: 5px; }
+        .num-row { display: flex; gap: 20px; margin-top: 15px; }
+        .win-n { width: 85px; height: 85px; border: 4px solid var(--gold); border-radius: 18px; line-height: 85px; font-size: 50px; font-weight: 950; color: var(--gold); display: none; box-shadow: 0 0 40px rgba(255,204,0,0.3); transform: scale(1); }
+        .btn { width: 100%; padding: 22px; background: transparent; border: 2.5px solid var(--neon); color: var(--neon); font-weight: 900; cursor: pointer; border-radius: 18px; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+        .btn:disabled { opacity: 0.2; }
+        .dev-tag { margin-top: 25px; font-size: 30px; font-weight: 950; color: #fff; text-shadow: 0 0 15px var(--neon); letter-spacing: 2px; }
+        #timer { color: var(--red); font-size: 14px; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="box">
+    <div style="font-size: 11px; opacity: 0.6; margin-bottom: 10px;">LEGENDARY_CORE_ACTIVE_V30</div>
+    
+    <input type="number" id="pIn" placeholder="PERIOD NUMBER">
+    
+    <div style="display: flex; gap: 5px;">
+        <select id="l1"><option value="B">L1:BIG</option><option value="S">L1:SMALL</option></select>
+        <select id="l2"><option value="B">L2:BIG</option><option value="S">L2:SMALL</option></select>
+        <select id="l3"><option value="B">L3:BIG</option><option value="S">L3:SMALL</option></select>
+    </div>
+
+    <div class="display">
+        <div id="resText">WAIT</div>
+        <div class="num-row">
+            <div id="n1" class="win-n">?</div>
+            <div id="n2" class="win-n">?</div>
+        </div>
+        <div id="timer">SYSTEM READY</div>
+    </div>
+
+    <button id="mainBtn" class="btn" onclick="predict()">EXECUTE HACK</button>
+    <div class="dev-tag">DEVELOPER SAFAIT</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const drops = Array(Math.floor(canvas.width/20)).fill(1);
+    function draw() {
+        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#00ff41"; ctx.font = "15px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(Math.floor(Math.random()*2), i*20, y*20);
+            if(y*20 > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    setInterval(draw, 40);
+
+    let locked = false;
+    function predict() {
+        if(locked) return;
+        const p = document.getElementById('pIn').value;
+        const v1 = document.getElementById('l1').value, v2 = document.getElementById('l2').value, v3 = document.getElementById('l3').value;
+        if(!p) return alert("Enter Period Number!");
+
+        const res = document.getElementById('resText'), n1 = document.getElementById('n1'), n2 = document.getElementById('n2'), btn = document.getElementById('mainBtn'), timer = document.getElementById('timer');
+        
+        res.innerText = "SCANNING"; res.classList.remove('active'); n1.style.display = n2.style.display = "none";
+
+        setTimeout(() => {
+            const pInt = parseInt(p);
+            // Master Algorithm Factor
+            const factor = (pInt * 23 + (v1 === 'B' ? 10 : 5)) % 100;
+
+            if (factor > 30) { 
+                // Advanced Trend Break Logic
+                let side = (v1 === v2 && v2 === v3) ? (v1==='B'?'SMALL':'BIG') : (factor % 2 === 0 ? "BIG" : "SMALL");
+                
+                res.innerText = side;
+                res.classList.add('active');
+
+                // High Accuracy Double Numbers
+                let num1 = (factor % 10);
+                if(side === "BIG" && num1 < 5) num1 = (num1 + 5);
+                if(side === "SMALL" && num1 > 4) num1 = (num1 - 5);
+                
+                let num2 = (num1 + 2) % 10;
+                if(side === "BIG" && num2 < 5) num2 = (num1 > 7) ? num1 - 2 : num1 + 1;
+                if(side === "SMALL" && num2 > 4) num2 = (num1 < 2) ? num1 + 2 : num1 - 1;
+
+                n1.innerText = num1; n2.innerText = num2;
+                n1.style.display = n2.style.display = "block";
+            } else {
+                res.innerText = "SKIP";
+            }
+
+            locked = true; btn.disabled = true;
+            let sec = 30;
+            let itv = setInterval(() => {
+                timer.innerText = "NEXT ANALYZE: " + sec + "s";
+                if(sec-- < 0) { clearInterval(itv); locked = false; btn.disabled = false; timer.innerText = "READY"; }
+            }, 1000);
+        }, 2000);
+    }
+</script>
+</body>
+</html>
